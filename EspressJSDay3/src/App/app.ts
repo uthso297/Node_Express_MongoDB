@@ -1,5 +1,5 @@
 // const express = require('express')
-import express, { Application, Request, Response } from 'express'
+import express, { Application, NextFunction, Request, Response } from 'express'
 const app: Application = express()
 // const port = 5000
 // import fs from 'fs';
@@ -11,10 +11,39 @@ app.use('/todos', todoRouter)
 // const filepath = path.join(__dirname, "../../db/todo.json")
 // console.log(filepath);
 
-app.get('/', (req: Request, res: Response) => {
-    // console.log({ req, res });
-    // console.log("tsc -w,nodemon");
-    res.send('Welcome to todos App!!!')
+// app.get('/', (req: Request, res: Response) => {
+//     // console.log({ req, res });
+//     // console.log("tsc -w,nodemon");
+//     res.send('Welcome to todos App!!!')
+// })
+
+app.get('/', (req: Request, res: Response, next: NextFunction) => {
+    console.log({
+        url: req.url,
+        method: req.method,
+        header: req.header
+    });
+    next()
+},
+
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            res.send('Welcome to Todos App')
+        } catch (error) {
+            next(error)
+        }
+
+    })
+
+app.use((req: Request, res: Response, next: NextFunction) => {
+    res.status(404).json({ message: "Route not found" })
+})
+
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+    if (error) {
+        console.log("error", error);
+        res.status(400).json({ message: "Something went wrong from global error handler", error })
+    }
 })
 
 // app.get('/todos/:title', (req: Request, res: Response) => {

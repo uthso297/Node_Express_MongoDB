@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -11,10 +20,34 @@ app.use(express_1.default.json());
 app.use('/todos', todos_router_1.todoRouter);
 // const filepath = path.join(__dirname, "../../db/todo.json")
 // console.log(filepath);
-app.get('/', (req, res) => {
-    // console.log({ req, res });
-    // console.log("tsc -w,nodemon");
-    res.send('Welcome to todos App!!!');
+// app.get('/', (req: Request, res: Response) => {
+//     // console.log({ req, res });
+//     // console.log("tsc -w,nodemon");
+//     res.send('Welcome to todos App!!!')
+// })
+app.get('/', (req, res, next) => {
+    console.log({
+        url: req.url,
+        method: req.method,
+        header: req.header
+    });
+    next();
+}, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        res.send('Welcome to Todos App');
+    }
+    catch (error) {
+        next(error);
+    }
+}));
+app.use((req, res, next) => {
+    res.status(404).json({ message: "Route not found" });
+});
+app.use((error, req, res, next) => {
+    if (error) {
+        console.log("error", error);
+        res.status(400).json({ message: "Something went wrong from global error handler", error });
+    }
 });
 // app.get('/todos/:title', (req: Request, res: Response) => {
 //     // console.log({ req, res });
